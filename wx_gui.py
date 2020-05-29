@@ -13,7 +13,6 @@ def bitmap_button_creation(path, width, height, parent, position_x, position_y, 
     result = wx.Bitmap(image)
     if not toggle:
         button_created = wx.BitmapButton(parent, pos=(position_x, position_y), size=(height, width), bitmap=result)
-
     else:
         button_created = wx.BitmapToggleButton(parent, pos=(position_x, position_y), size=(height, width), label=result)
     return button_created
@@ -74,6 +73,7 @@ class MyFrame(wx.Frame):
         change_folder_button = wx.Button(panel, label='CHANGE FOLDER', pos=(510, 54), size=(183, 36))
 
         backward_button = bitmap_button_creation('icon_backward.png', 40, 40, panel, 510, 130)
+        backward_button.Bind(wx.EVT_BUTTON, self.backward_button_clicked)
 
         # event binding for toggle button
         play_button = bitmap_button_creation('icon_play.png', 80, 80, panel, 560, 110, toggle=True)
@@ -98,12 +98,11 @@ class MyFrame(wx.Frame):
         print('obecne i:', self.i % len(self.playlist))
         pygame.mixer.music.play()
 
-        #
-        # elif self.i == (len(self.playlist) - 1):
-        #     pygame.mixer.music.load(self.playlist[self.i])
-        #     pygame.mixer.music.play()
-        #     print('jestem w else')
-        # pygame.mixer.music.load(self.playlist[0])
+    def backward_button_clicked(self, event):
+        self.i -= 1
+        pygame.mixer.music.load(self.playlist[self.i % len(self.playlist)])
+        print('obecne i:', self.i % len(self.playlist))
+        pygame.mixer.music.play()
 
 
 app = wx.App()
