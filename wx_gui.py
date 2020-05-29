@@ -40,7 +40,7 @@ class MyFrame(wx.Frame):
         panel = wx.Panel(self)
         pygame.mixer.init()
 
-        folder = '~/Desktop/project_files'
+        folder = '~/Desktop/muzyka'
 
         self.i = 0
 
@@ -48,8 +48,8 @@ class MyFrame(wx.Frame):
         for filename in os.listdir(os.path.expanduser(folder)):
             if filename.endswith('.mp3'):
                 self.playlist.append(filename)
-        for i in range(len(self.playlist)):
-            print(i, self.playlist[i])
+        # for i in range(len(self.playlist)):
+        #     print(i, self.playlist[i])
 
         pygame.mixer.music.load(self.playlist[self.i])
 
@@ -72,36 +72,45 @@ class MyFrame(wx.Frame):
 
         change_folder_button = wx.Button(panel, label='CHANGE FOLDER', pos=(510, 54), size=(183, 36))
 
-        backward_button = bitmap_button_creation('icon_backward.png', 40, 40, panel, 510, 130)
-        backward_button.Bind(wx.EVT_BUTTON, self.backward_button_clicked)
+        self.backward_button = bitmap_button_creation('icon_backward.png', 40, 40, panel, 510, 130)
+        self.backward_button.Bind(wx.EVT_BUTTON, self.backward_button_clicked)
 
         # event binding for toggle button
-        play_button = bitmap_button_creation('icon_play.png', 80, 80, panel, 560, 110, toggle=True)
-        play_button.Bind(wx.EVT_TOGGLEBUTTON, self.toggle_button_clicked)
+        self.play_button = bitmap_button_creation('icon_play.png', 80, 80, panel, 560, 110, toggle=True)
+        self.play_button.Bind(wx.EVT_TOGGLEBUTTON, self.toggle_button_clicked)
 
-        forward_button = bitmap_button_creation('icon_forward.png', 40, 40, panel, 650, 130)
-        forward_button.Bind(wx.EVT_BUTTON, self.forward_button_clicked)
+        self.forward_button = bitmap_button_creation('icon_forward.png', 40, 40, panel, 650, 130)
+        self.forward_button.Bind(wx.EVT_BUTTON, self.forward_button_clicked)
+
         # --------------------------------------
 
         self.Show()
 
     def toggle_button_clicked(self, event):
         btn_var = event.GetEventObject().GetValue()
-        if btn_var:
-            pygame.mixer.music.play()
+        if pygame.mixer.music.get_busy():
+            if btn_var:
+                pygame.mixer.music.unpause()
+            else:
+                pygame.mixer.music.pause()
         else:
-            pygame.mixer.music.stop()
+            if btn_var:
+                pygame.mixer.music.play()
+            else:
+                pygame.mixer.music.pause()
 
     def forward_button_clicked(self, event):
+        self.play_button.SetValue(1)
         self.i += 1
         pygame.mixer.music.load(self.playlist[self.i % len(self.playlist)])
-        print('obecne i:', self.i % len(self.playlist))
+        # print('obecne i:', self.i % len(self.playlist))
         pygame.mixer.music.play()
 
     def backward_button_clicked(self, event):
+        self.play_button.SetValue(1)
         self.i -= 1
         pygame.mixer.music.load(self.playlist[self.i % len(self.playlist)])
-        print('obecne i:', self.i % len(self.playlist))
+        # print('obecne i:', self.i % len(self.playlist))
         pygame.mixer.music.play()
 
 
