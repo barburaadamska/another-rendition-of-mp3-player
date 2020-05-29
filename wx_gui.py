@@ -3,6 +3,7 @@
 
 import wx
 import pygame
+import os
 
 
 def bitmap_button_creation(path, width, height, parent, position_x, position_y, toggle=False):
@@ -39,7 +40,20 @@ class MyFrame(wx.Frame):
         super().__init__(parent=None, title='MP3 Player', size=(800, 300))
         panel = wx.Panel(self)
         pygame.mixer.init()
-        pygame.mixer.music.load('shewants.mp3')
+
+        folder = '~/Desktop/project_files'
+
+        self.i = 0
+
+        self.playlist = []
+        for filename in os.listdir(os.path.expanduser(folder)):
+            if filename.endswith('.mp3'):
+                self.playlist.append(filename)
+        for i in range(len(self.playlist)):
+            print(i, self.playlist[i])
+
+        pygame.mixer.music.load(self.playlist[self.i])
+
         self.SetBackgroundColour('#ffffff')
 
         # LEFT SIDE WITH LABELS
@@ -59,23 +73,37 @@ class MyFrame(wx.Frame):
 
         change_folder_button = wx.Button(panel, label='CHANGE FOLDER', pos=(510, 54), size=(183, 36))
 
-        forward_button = bitmap_button_creation('icon_backward.png', 40, 40, panel, 510, 130)
+        backward_button = bitmap_button_creation('icon_backward.png', 40, 40, panel, 510, 130)
 
         # event binding for toggle button
         play_button = bitmap_button_creation('icon_play.png', 80, 80, panel, 560, 110, toggle=True)
+        play_button.Bind(wx.EVT_TOGGLEBUTTON, self.toggle_button_clicked)
 
-        play_button.Bind(wx.EVT_TOGGLEBUTTON, self.onClick)
         forward_button = bitmap_button_creation('icon_forward.png', 40, 40, panel, 650, 130)
+        forward_button.Bind(wx.EVT_BUTTON, self.forward_button_clicked)
         # --------------------------------------
 
         self.Show()
 
-    def onClick(self, event):
+    def toggle_button_clicked(self, event):
         btn_var = event.GetEventObject().GetValue()
         if btn_var:
             pygame.mixer.music.play()
         else:
             pygame.mixer.music.stop()
+
+    def forward_button_clicked(self, event):
+        self.i += 1
+        pygame.mixer.music.load(self.playlist[self.i % len(self.playlist)])
+        print('obecne i:', self.i % len(self.playlist))
+        pygame.mixer.music.play()
+
+        #
+        # elif self.i == (len(self.playlist) - 1):
+        #     pygame.mixer.music.load(self.playlist[self.i])
+        #     pygame.mixer.music.play()
+        #     print('jestem w else')
+        # pygame.mixer.music.load(self.playlist[0])
 
 
 app = wx.App()
