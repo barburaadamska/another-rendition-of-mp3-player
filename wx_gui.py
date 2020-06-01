@@ -36,15 +36,16 @@ def label_creation(parent, user_text, fontsize, position_x, position_y, color, w
     label_created.SetLabel(label_text)
     return label_created
 
+# playlist creation method
 def playlist_creation(path, playlist = [], shuffle_var = False):
     if not shuffle_var:
         for filename in os.listdir(os.path.expanduser(path)):
             if filename.endswith('.mp3'):
                 playlist.append(filename)
-        # print(playlist)
+        print(playlist)
     else:
         random.shuffle(playlist)
-        # print(playlist)
+        print(playlist)
     return playlist
 
 # wx Frame
@@ -70,7 +71,7 @@ class MyFrame(wx.Frame):
         self.folder = '~/Desktop/moje_projektowe/'
 
         # TODO:
-        # - integration with DirDialog (lines xx-xx)
+        # - integration with DirDialog (lines 157-169)
 
         # playlist creation for playback
 
