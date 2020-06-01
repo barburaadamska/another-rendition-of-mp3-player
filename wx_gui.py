@@ -4,6 +4,7 @@
 import wx
 import pygame
 import os
+import random
 
 
 # shortened button creation method
@@ -35,7 +36,16 @@ def label_creation(parent, user_text, fontsize, position_x, position_y, color, w
     label_created.SetLabel(label_text)
     return label_created
 
-
+def playlist_creation(path, playlist = [], shuffle_var = False):
+    if not shuffle_var:
+        for filename in os.listdir(os.path.expanduser(path)):
+            if filename.endswith('.mp3'):
+                playlist.append(filename)
+        # print(playlist)
+    else:
+        random.shuffle(playlist)
+        # print(playlist)
+    return playlist
 
 # wx Frame
 class MyFrame(wx.Frame):
@@ -57,22 +67,17 @@ class MyFrame(wx.Frame):
         # self.clock = pygame.time.Clock()
 
         # where the music will be playing from
-        folder = '~/Desktop/muzyka'
+        self.folder = '~/Desktop/moje_projektowe/'
 
         # TODO:
         # - integration with DirDialog (lines xx-xx)
 
+        # playlist creation for playback
+
+        self.playlist = playlist_creation(self.folder)
 
         # index needed to navigate through the playlist
         self.i = 0
-
-        # playlist with all the files in the 'folder' directory
-        self.playlist = []
-        for filename in os.listdir(os.path.expanduser(folder)):
-            if filename.endswith('.mp3'):
-                self.playlist.append(filename)
-        # for i in range(len(self.playlist)):
-        #     print(i, self.playlist[i])
 
         # initiation of pygame mixer
         pygame.mixer.music.load(self.playlist[self.i])
@@ -107,6 +112,8 @@ class MyFrame(wx.Frame):
         self.forward_button = bitmap_button_creation('icon_forward.png', 40, 40, panel, 650, 130)
         self.forward_button.Bind(wx.EVT_BUTTON, self.forward_button_clicked)
 
+        self.shuffle_button = bitmap_button_creation('icon-shuffle.png', 30, 30, panel, 585, 200, toggle=True)
+        self.shuffle_button.Bind(wx.EVT_TOGGLEBUTTON, self.shuffle_button_clicked)
         # --------------------------------------
 
         self.Show()
@@ -159,6 +166,13 @@ class MyFrame(wx.Frame):
             # - *perhaps* add a playlist feature - an additional part of the UI with the .mp3 files listed
             print(self.dialog.GetPath())
         self.dialog.Destroy()
+
+    def shuffle_button_clicked(self, event):
+        self.shuffle_var = event.GetEventObject().GetValue()
+        if self.shuffle_var:
+            self.playlist = playlist_creation(self.folder, shuffle_var=True)
+        else:
+            self.playlist = playlist_creation(self.folder, playlist=[])
 
 
 # initiation of the app
