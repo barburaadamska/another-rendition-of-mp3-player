@@ -42,6 +42,7 @@ class MyFrame(wx.Frame):
         pygame.mixer.init()
         self.folder = '~/Desktop/moje_projektowe/' # <- PATH TO THE PROJECT CATALOG
 
+
         # playlist creation for playback
         self.playlist = playlist_creation(self.folder)
 
@@ -57,8 +58,11 @@ class MyFrame(wx.Frame):
         self.SetBackgroundColour('#ffffff')
 
         # LEFT SIDE WITH LABELS
+
         self.playing_from_label = label_creation(panel, 'NOW PLAYING FROM', 13, 99, 54, '#707070')
-        self.user_whereabouts_label = label_creation(panel, 'Twoja Stara in Desktop', 17, 99, 79, '#FF2D55')
+
+        self.label = self.folder.split('/')[-2]
+        self.user_whereabouts_label = label_creation(panel, self.label, 17, 99, 79, '#FF2D55')
 
         self.song_title_label = label_creation(panel, 'Song Title', 22, 99, 123, '#000000', 'bold')
         self.artist_label = label_creation(panel, 'Artist Name', 17, 99, 157, '#707070')
@@ -74,7 +78,7 @@ class MyFrame(wx.Frame):
         self.backward_button.Bind(wx.EVT_BUTTON, self.backward_button_clicked)
 
         self.play_button = bitmap_button_creation('icon_play.png', 80, 80, panel, 560, 110, toggle=True)
-        self.play_button.Bind(wx.EVT_TOGGLEBUTTON, self.toggle_button_clicked)
+        self.play_button.Bind(wx.EVT_TOGGLEBUTTON, self.play_button_clicked)
 
         self.forward_button = bitmap_button_creation('icon_forward.png', 40, 40, panel, 650, 130)
         self.forward_button.Bind(wx.EVT_BUTTON, self.forward_button_clicked)
@@ -86,7 +90,7 @@ class MyFrame(wx.Frame):
         self.Show()
 
     # BUTTON ACTIONS
-    def toggle_button_clicked(self, event):
+    def play_button_clicked(self, event):
         # this returns a bool
         btn_var = event.GetEventObject().GetValue()
         # for the toggle button to pause/unpause
@@ -102,6 +106,8 @@ class MyFrame(wx.Frame):
                 pygame.mixer.music.play()
             else:
                 pygame.mixer.music.pause()
+        self.update_track_label()
+
 
     def forward_button_clicked(self, event):
         # in case playback has been stopped, this feature is parallel to the rest of
@@ -111,6 +117,7 @@ class MyFrame(wx.Frame):
         # this allows for moving through the playlist - modulo operation returns the
         # index of the track to be played
         pygame.mixer.music.load(self.playlist[self.i % len(self.playlist)])
+        self.update_track_label()
         # print('obecne i:', self.i % len(self.playlist))
         pygame.mixer.music.play()
 
@@ -119,6 +126,7 @@ class MyFrame(wx.Frame):
         self.i -= 1
         pygame.mixer.music.load(self.playlist[self.i % len(self.playlist)])
         # print('obecne i:', self.i % len(self.playlist))
+        self.update_track_label()
         pygame.mixer.music.play()
 
     def change_folder_button_clicked(self, event):
@@ -127,9 +135,12 @@ class MyFrame(wx.Frame):
 
         self.dialog = wx.DirDialog(None, "Choose a directory:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
         if self.dialog.ShowModal() == wx.ID_OK:
-            self.working_directory = self.dialog.GetPath()
-            print(self.dialog.GetPath())
+            folder = self.dialog.GetPath() + '/'
+            print(folder)
+            # TUTAJ COŚ NIE DZIAŁA XD
+            # self.playlist = playlist_creation(folder, playlist=[])
         self.dialog.Destroy()
+
 
     def shuffle_button_clicked(self, event):
         self.shuffle_var = event.GetEventObject().GetValue()
@@ -137,6 +148,9 @@ class MyFrame(wx.Frame):
             self.playlist = playlist_creation(self.folder, shuffle_var=True)
         else:
             self.playlist = playlist_creation(self.folder, playlist=[])
+
+    def update_track_label(self):
+        self.song_title_label.SetLabel(self.playlist[self.i % len(self.playlist)])
 
 
 # shortened button creation method
